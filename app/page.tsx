@@ -28,6 +28,15 @@ import {
 import { database } from "@/lib/firebase"
 import { ref, push, set, remove, onValue, off } from "firebase/database"
 
+interface RegisterForm {
+  username: string
+  profileName: string
+  profilePicture: File | null
+  phoneNumber: string
+  password: string
+  confirmPassword: string
+}
+
 interface User {
   id: string
   username: string
@@ -79,7 +88,7 @@ export default function PhotoAlbumApp() {
   })
 
   // Register form state
-  const [registerForm, setRegisterForm] = useState({
+  const [registerForm, setRegisterForm] = useState<RegisterForm>({
     username: "",
     profileName: "",
     profilePicture: null,
@@ -473,7 +482,7 @@ export default function PhotoAlbumApp() {
         setShowCreateEventDialog(false)
       } catch (error) {
         console.error("Create event error:", error)
-        alert("Арга хэмжээ үүсгэхэд алдаа гарлаа")
+        alert("Үүсгэхэд алдаа гарлаа")
       }
     }
   }
@@ -485,7 +494,7 @@ export default function PhotoAlbumApp() {
       setShowDeleteEventDialog(false)
     } catch (error) {
       console.error("Delete event error:", error)
-      alert("Арга хэмжээ устгахад алдаа гарлаа")
+      alert("Устгахад алдаа гарлаа")
     }
   }
 
@@ -987,20 +996,46 @@ export default function PhotoAlbumApp() {
                     <Search className="w-6 h-6 text-black" />
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="p-1 h-8 w-8">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="p-1 h-8 w-8 hover:bg-gray-100 focus:bg-gray-100 relative z-10"
+                          onClick={() => console.log("[v0] Family albums menu clicked")}
+                        >
                           <MoreHorizontal className="w-6 h-6 text-black" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-white border-black">
-                        <DropdownMenuItem onClick={() => setShowCreateGroupDialog(true)}>
+                      <DropdownMenuContent
+                        align="end"
+                        className="bg-white border border-black shadow-lg z-50 min-w-[150px]"
+                      >
+                        <DropdownMenuItem
+                          onClick={() => {
+                            console.log("[v0] Create group clicked")
+                            setShowCreateGroupDialog(true)
+                          }}
+                          className="hover:bg-gray-100 cursor-pointer"
+                        >
                           <Plus className="w-4 h-4 mr-2" />
                           Бүлэг нэмэх
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setShowDeleteGroupDialog(true)}>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            console.log("[v0] Delete group clicked")
+                            setShowDeleteGroupDialog(true)
+                          }}
+                          className="hover:bg-gray-100 cursor-pointer"
+                        >
                           <Trash2 className="w-4 h-4 mr-2" />
                           Бүлэг устгах
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={handleLogout}>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            console.log("[v0] Logout clicked")
+                            handleLogout()
+                          }}
+                          className="hover:bg-gray-100 cursor-pointer"
+                        >
                           <ArrowLeft className="w-4 h-4 mr-2" />
                           Гарах
                         </DropdownMenuItem>
@@ -1244,16 +1279,36 @@ export default function PhotoAlbumApp() {
                     <Search className="w-6 h-6 text-black" />
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="p-1 h-8 w-8">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="p-1 h-8 w-8 hover:bg-gray-100 focus:bg-gray-100 relative z-10"
+                          onClick={() => console.log("[v0] Events menu clicked")}
+                        >
                           <MoreHorizontal className="w-6 h-6 text-black" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-white border-black">
-                        <DropdownMenuItem onClick={() => setShowCreateEventDialog(true)}>
+                      <DropdownMenuContent
+                        align="end"
+                        className="bg-white border border-black shadow-lg z-50 min-w-[150px]"
+                      >
+                        <DropdownMenuItem
+                          onClick={() => {
+                            console.log("[v0] Create event clicked")
+                            setShowCreateEventDialog(true)
+                          }}
+                          className="hover:bg-gray-100 cursor-pointer"
+                        >
                           <Plus className="w-4 h-4 mr-2" />
                           Цомог нэмэх
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setShowDeleteEventDialog(true)}>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            console.log("[v0] Delete event clicked")
+                            setShowDeleteEventDialog(true)
+                          }}
+                          className="hover:bg-gray-100 cursor-pointer"
+                        >
                           <Trash2 className="w-4 h-4 mr-2" />
                           Устгах
                         </DropdownMenuItem>
@@ -1303,7 +1358,7 @@ export default function PhotoAlbumApp() {
                 {activeEventsTab === "members" ? (
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold text-black">Арга хэмжээний гишүүд</h3>
+                      <h3 className="text-lg font-semibold text-black">Гишүүд</h3>
                       <div className="flex gap-2">
                         <Button
                           size="sm"
@@ -1378,16 +1433,16 @@ export default function PhotoAlbumApp() {
                 <Dialog open={showCreateEventDialog} onOpenChange={setShowCreateEventDialog}>
                   <DialogContent className="bg-white">
                     <DialogHeader>
-                      <DialogTitle>Шинэ арга хэмжээ үүсгэх</DialogTitle>
+                      <DialogTitle>Үүсгэх</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4">
                       <div>
-                        <Label htmlFor="eventTitle">Арга хэмжээний нэр</Label>
+                        <Label htmlFor="eventTitle">Нэр</Label>
                         <Input
                           id="eventTitle"
                           value={newEventTitle}
                           onChange={(e) => setNewEventTitle(e.target.value)}
-                          placeholder="Арга хэмжээний нэр оруулах"
+                          placeholder="Нэр оруулах"
                         />
                       </div>
                       <div>
@@ -1423,10 +1478,10 @@ export default function PhotoAlbumApp() {
                 <Dialog open={showDeleteEventDialog} onOpenChange={setShowDeleteEventDialog}>
                   <DialogContent className="bg-white">
                     <DialogHeader>
-                      <DialogTitle>Арга хэмжээ устгах</DialogTitle>
+                      <DialogTitle>Устгах</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4">
-                      <p className="text-sm text-gray-600">Устгах арга хэмжээгээ сонгоно уу:</p>
+                      <p className="text-sm text-gray-600">Устгах цомог сонгоно уу:</p>
                       <div className="space-y-2 max-h-60 overflow-y-auto">
                         {events.map((event) => (
                           <Card
@@ -1552,16 +1607,36 @@ export default function PhotoAlbumApp() {
                     <Search className="w-6 h-6 text-black" />
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="p-1 h-8 w-8">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="p-1 h-8 w-8 hover:bg-gray-100 focus:bg-gray-100 relative z-10"
+                          onClick={() => console.log("[v0] Album menu clicked")}
+                        >
                           <MoreHorizontal className="w-6 h-6 text-black" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-white border-black">
-                        <DropdownMenuItem onClick={() => setShowAddPhotoDialog(true)}>
+                      <DropdownMenuContent
+                        align="end"
+                        className="bg-white border border-black shadow-lg z-50 min-w-[150px]"
+                      >
+                        <DropdownMenuItem
+                          onClick={() => {
+                            console.log("[v0] Add photo clicked")
+                            setShowAddPhotoDialog(true)
+                          }}
+                          className="hover:bg-gray-100 cursor-pointer"
+                        >
                           <Plus className="w-4 h-4 mr-2" />
                           Зураг нэмэх
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setShowDeletePhotoDialog(true)}>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            console.log("[v0] Delete photo clicked")
+                            setShowDeletePhotoDialog(true)
+                          }}
+                          className="hover:bg-gray-100 cursor-pointer"
+                        >
                           <Trash2 className="w-4 h-4 mr-2" />
                           Устгах
                         </DropdownMenuItem>
